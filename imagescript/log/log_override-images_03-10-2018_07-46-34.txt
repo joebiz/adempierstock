@@ -1,0 +1,13 @@
+
+Label not set for SKU=>501273 and Image=>501273rulerwh.jpg
+Label not set for SKU=>501273 and Image=>501273bodwh.jpg
+Label not set for SKU=>501273 and Image=>501273ro.jpg
+Label not set for SKU=>501273 and Image=>501273ye.jpg
+Label not set for SKU=>501273 and Image=>501273backwh.jpg
+Label not set for SKU=>501273 and Image=>501273mainwh.jpg
+
+
+Total images found in images_to_update/ dir=>0
+Total new file copied=>0
+Total existing file override=>0
+ Email sent.

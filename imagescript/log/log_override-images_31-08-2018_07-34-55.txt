@@ -1,0 +1,18 @@
+
+Label not set for SKU=>000126 and Image=>000126bodye.jpg
+Label not set for SKU=>000126 and Image=>000126rulerye.jpg
+Label not set for SKU=>000126 and Image=>000126backye.jpg
+Label not set for SKU=>000126 and Image=>000126rulerro.jpg
+Label not set for SKU=>000126 and Image=>000126mainwh.jpg
+Label not set for SKU=>000126 and Image=>000126ye.jpg
+Label not set for SKU=>204978 and Image=>204978ro.jpg
+Label not set for SKU=>000126 and Image=>000126backro.jpg 
+File 004922rulerye.jpg Added for SKU=>004922 # Image=>/images/diamond-engagement-rings-14k-pre-set-diamond-ring-75-p-6807_rulerye.jpg # Label=>rulerye # Position=>47
+Resized image not moved to S3 file=>/usr/bin/s3cmd put --acl-public --add-header='Cache-Control:no-cache' -c /var/www/ItsHot/bucket/.s3cfg /home/cloudpanel/htdocs/www.itshot.com/current/media/catalog/product/31x31/images/diamond-engagement-rings-14k-pre-set-diamond-ring-75-p-6807_rulerye.jpg s3://itshot/catalog/product/31x31/images/diamond-engagement-rings-14k-pre-set-diamond-ring-75-p-6807_rulerye.jpg<br />
+<b>Fatal error</b>:  Uncaught ImagickException: unable to open image `/home/cloudpanel/htdocs/www.itshot.com/current/media/catalog/product/images/diamond-engagement-rings-14k-pre-set-diamond-ring-75-p-6807_rulerye.jpg': No such file or directory @ error/blob.c/OpenBlob/2701 in /data/www.itshot.com/adempierstock/imagescript/override-images-all.php:514
+Stack trace:
+#0 /data/www.itshot.com/adempierstock/imagescript/override-images-all.php(514): Imagick-&gt;readimage('/home/cloudpane...')
+#1 /data/www.itshot.com/adempierstock/imagescript/override-images-all.php(471): resizeImageToS3('diamond-engagem...', '50x50', 50, 50, 'images')
+#2 /data/www.itshot.com/adempierstock/imagescript/override-images-all.php(303): resize('diamond-engagem...', 'images')
+#3 {main}
+  thrown in <b>/data/www.itshot.com/adempierstock/imagescript/override-images-all.php</b> on line <b>514</b><br />

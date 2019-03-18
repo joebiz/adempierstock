@@ -1,0 +1,6 @@
+
+
+
+Total images found in images_to_update/ dir=>0
+Total new file copied=>0
+Total existing file override=>0

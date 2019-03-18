@@ -1,0 +1,23 @@
+
+Label not set for SKU=>501273 and Image=>501273rulerwh.jpg
+Label not set for SKU=>501273 and Image=>501273bodwh.jpg
+Label not set for SKU=>501273 and Image=>501273ro.jpg
+Label not set for SKU=>501273 and Image=>501273ye.jpg
+Label not set for SKU=>501273 and Image=>501273backwh.jpg
+Label not set for SKU=>501273 and Image=>501273mainwh.jpg
+
+
+Total images found in images_to_update/ dir=>0
+Total new file copied=>0
+Total existing file override=>0<br />
+<b>Fatal error</b>:  Uncaught Varien_Exception: Invalid method Aschroder_SMTPPro_Model_Email::AddCC(Array
+(
+    [0] =&gt; ankush@onsinteractive.com
+    [1] =&gt; Ankush Garg
+)
+) in /home/cloudpanel/htdocs/www.itshot.com/releases/2018_09_06_7_53_28_branch_master/lib/Varien/Object.php:653
+Stack trace:
+#0 /data/www.itshot.com/adempierstock/imagescript/override-images-all.php(919): Varien_Object-&gt;__call('AddCC', Array)
+#1 /data/www.itshot.com/adempierstock/imagescript/override-images-all.php(1040): sendEmail('/home/cloudpane...')
+#2 {main}
+  thrown in <b>/home/cloudpanel/htdocs/www.itshot.com/releases/2018_09_06_7_53_28_branch_master/lib/Varien/Object.php</b> on line <b>653</b><br />
