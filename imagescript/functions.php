@@ -259,18 +259,18 @@ function scaleImage($image_width, $image_height, $max_width, $max_height)
 function copyInAnotherFolder($imageName)
 {
     global $rootDir, $backupDirectory;
-    if (file_exists($rootDir . "adempierstock/imagescript/" . $backupDirectory . $imageName)) {
+    if (file_exists($rootDir . "adempierstock/imagescript/" . $backupDirectory . basename($imageName))) {
         $exImage = explode(".", $imageName);
         $sku = $exImage[0];
         $exImage = $exImage[1];
-        rename($rootDir . "adempierstock/imagescript/" . $backupDirectory . $imageName, $rootDir . "adempierstock/imagescript/" . $backupDirectory . $sku . "-" . date('d-m-Y') . "." . $exImage);
+        rename($rootDir . "adempierstock/imagescript/" . $backupDirectory . basename($imageName), $rootDir . "adempierstock/imagescript/" . $backupDirectory . $sku . "-" . date('d-m-Y') . "." . $exImage);
         $result++;
 
-        if (copy($rootDir . "adempierstock/imagescript/"  . $imageName, $rootDir . "adempierstock/imagescript/" . $backupDirectory . $imageName)) {
+        if (copy($rootDir . "adempierstock/imagescript/"  . $imageName, $rootDir . "adempierstock/imagescript/" . $backupDirectory . basename($imageName))) {
             unlink($rootDir . "adempierstock/imagescript/" . $imageName);
         }
     } else {
-        if (copy($rootDir . "adempierstock/imagescript/" . $imageName, $rootDir . "adempierstock/imagescript/" . $backupDirectory . $imageName)) {
+        if (copy($rootDir . "adempierstock/imagescript/" . $imageName, $rootDir . "adempierstock/imagescript/" . $backupDirectory . basename($imageName))) {
             unlink($rootDir . "adempierstock/imagescript/" . $imageName);
         }
     }

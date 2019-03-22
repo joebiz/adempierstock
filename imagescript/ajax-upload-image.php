@@ -71,7 +71,7 @@ if (($status['state'] == 'init' || $status['state'] == 'processing') && $status[
                         if (copy($rootDir . "adempierstock/imagescript/"  . $filename, $rootDir . "media/catalog/product" . $oldimage)) {
                             updateimagelabel_position($productId, $label, $position, $oldimage, $sku, $ismain, $filename);
                             resize($imgname, $imgExistingPath);
-                            copyInAnotherFolder(basename($filename));
+                            copyInAnotherFolder($filename);
                             disbleImages($productId, $sku);
                             $myFile = $logFileAdempier;
 
@@ -93,7 +93,7 @@ if (($status['state'] == 'init' || $status['state'] == 'processing') && $status[
                         if (copy($rootDir . "adempierstock/imagescript/"  . $filename, $rootDir . "media/catalog/product/{$imgExistingPath}/" . $newImgName)) {
                             updateimagelabel_position($productId, $label, $position, "/{$imgExistingPath}/" . $newImgName, $sku, $ismain, $filename);
                             resize($newImgName, $imgExistingPath);
-                            copyInAnotherFolder(basename($filename));
+                            copyInAnotherFolder($filename);
                             disbleImages($productId, $sku);
                             $myFile = $logFileAdempier;
 
