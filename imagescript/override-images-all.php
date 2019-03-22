@@ -131,48 +131,6 @@ $newfileCnt = 0;
 $issue_wthany_product=0;
 $issue_withany_mainimage_product = array();
 //$refreshcache_product=array();
-function saveStatus($filename = 'status.log', $default = array()){
-    $data = is_callable($default) ? $default(): $default ;
-    Mage::helper('feedexport/io')->write($filename, json_encode($data));
-    return $data;
-}
-
-function readStatus($filename) {
-    $c = Mage::helper('feedexport/io')->read($filename);
-    $data = json_decode($c, true);
-    return $data;
-}
-
-function fetchStatus($filename, $default = array()){
-    $data = array();
-    if(!file_exists($filename)){
-        $data = saveStatus($filename, $default);
-    } else {
-        $data = readStatus($filename);
-    }
-    return $data;
-}
-
-function getTotalImageFiles(){
-    return count(glob('images_to_update/*.{jpg,png,gif}', GLOB_BRACE));
-}
-
-function clearStatus($filename){
-    @unlink($filename);
-}
-
-function isComplete($status){
-    return $status['total_image_files'] == $status['total_image_uploaded'];
-}
-
-
-$status = fetchStatus('status.log', function(){
-    return [
-        'total_image_files' => getTotalImageFiles(),
-        'total_image_uploaded' => 0
-    ];
-});
-
 while($filename = readdir($dp))
 {
 	//echo "<br />".$filename;
