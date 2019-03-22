@@ -1,29 +1,98 @@
 <?php
+
 set_time_limit(0);
 error_reporting(E_ALL ^ E_NOTICE);
-ini_set('display_errors','On');
-$rootDir = '/home/cloudpanel/htdocs/www.itshot.com/current/';
+ini_set("display_errors", 'On');
 
+$rootDir = "/home/cloudpanel/htdocs/www.itshot.com/current/";
+$backupDirectory = "images_to_update/old/";
+$adempierDirectory = "adempierstock/imagescript/adempier-images-update/";
+$filePostFixAdempier = "update-image-path.txt";
+$logFileAdempier = $rootDir . $adempierDirectory . $filePostFixAdempier;
+$filePostFix = "_" . date("d-m-Y_H-i-s") . ".txt";
+$logFile = $rootDir . "adempierstock/imagescript/log/log_override-images" . $filePostFix;
+$logFileWebpath = "https://www.itshot.com/adempierstock/imagescript/log/log_override-images" . $filePostFix;
+$labels = array(
+    'main', 'mainwh', 'mainye', 'mainro', 'mainbl', 'maintt', 'mainwyr', 'mainwr', 'mainwy',
+    'ye', 'wh', 'ro', 'bl', 'tt', 'bk', 'wyr','wr', 'wy',
+    'back', 'backwh','backye', 'backro', 'backbl', 'backtt', 'backwyr', 'backwr', 'backwy',
+    'bod', 'bodwh', 'bodye', 'bodro', 'bodbl', 'bodtt', 'bodwyr', 'bodwr', 'bodwy',
+    'box', 'boxwh','boxye', 'boxro', 'boxbl', 'boxtt','boxwyr', 'boxwr', 'boxwy',
+    'ruler', 'rulerwh', 'rulerye', 'rulerro', 'rulerbl', 'rulertt', 'rulerwry', 'rulerwy', 'rulerwr','aa', 'ab', 'ac', 'ad',
+    'clasp', 'claspye', 'claspro', 'bodwh', 'chain', 'whye','whro','mainwhye','mainwhro',
+    'backwhro', 'backwhye', 'bodwhro', 'bodwhye','boxwhro','boxwhye',
+    'chainro', 'rulerwhro','chainwh','chainye','rulerwhye'
+);
 
+include($rootDir . "app/Mage.php");
+Mage::app()->setCurrentStore(Mage_Core_Model_App::ADMIN_STORE_ID);
+Mage::app("default");
+$conn = Mage::getSingleton('core/resource')->getConnection('core_read');
+$write = Mage::getSingleton('core/resource')->getConnection('core_write');
+$tablePrefix = (string) Mage::getConfig()->getTablePrefix();
 
+function getImages()
+{
+    return glob('images_to_update/*.{jpg,png,gif}', GLOB_BRACE);
+}
 
-function getConfig() {
-    $handle = fopen("status.log", "r"); 
-    if(!$handle){
-        return false;
-    }
-    $data = json_decode(fread($handle, filesize($handle))); 
-    fclose($handle); 
+function saveStatus($filename = 'status.log', $default = array())
+{
+    $data = is_callable($default) ? $default() : $default;
+    Mage::helper('feedexport/io')->write($filename, json_encode($data));
     return $data;
 }
 
-function saveConfig($data) {
-    $handle = fopen("status.log", "w"); 
-    if(!$handle){
+function readStatus($filename = 'status.log')
+{
+    $c = Mage::helper('feedexport/io')->read($filename);
+    $data = json_decode($c, true);
+    return $data;
+}
+
+function fetchStatus($filename = 'status.log', $default = array())
+{
+    $data = array();
+    if (!file_exists($filename) && $default) {
+        $data = saveStatus($filename, $default);
+    } else {
+        $data = readStatus($filename);
+    }
+    return $data;
+}
+
+function clearStatus($filename = 'status.log')
+{
+    @unlink($filename);
+}
+
+function getFirstImage($images, $exclude = array())
+{
+    $img = '';
+    foreach ($images as $img) {
+        if (!in_array($img, $exclude)) {
+            break;
+        }
+    }
+    return $img;
+}
+
+function parseImage($filename)
+{
+    global $labels;
+    $sku = '';
+    $ext = pathinfo($filename, PATHINFO_EXTENSION);
+    $name = basename($filename, '.' . $ext);
+    foreach ($labels as $label) {
+        if (preg_match("/{$label}$/", $name) == 1) {
+            $sku = str_replace($label, '', $name);
+            break;
+        }
+    }
+    if (!$sku || !$label) {
         return false;
     }
-    fwrite($handle, json_encode($data));
-    fclose($handle); 
+    return array($sku, $label, $ext);
 }
 
 function uploadFileToAmazonS3($imgFileName, $imgExistingPath)
@@ -40,7 +109,7 @@ function deleteFileFromAmazonS3($imgFileName, $imgExistingPath)
     $exe_image = '/usr/bin/s3cmd del -c /var/www/ItsHot/bucket/.s3cfg s3://itshot/media/catalog/product/' . $imgExistingPath . '/' . $imgFileName;
     shell_exec($exe_image);
     $exe_image2 = '/usr/bin/s3cmd del -c /var/www/ItsHot/bucket/.s3cfg s3://itshot/catalog/product/' . $imgExistingPath . '/' . $imgFileName;
-    shell_exec($exe_image2);
+    shell_exec($exe_image2);    
 }
 
 function selectProductUrlKey($productId)
@@ -56,7 +125,7 @@ function selectProductUrlKey($productId)
     return $productUrl;
 }
 
-function getExistingImagePath($productId, $newImgName, $sku)
+function getExistingImagePath($productId, $newImgName)
 {
     global $conn, $tablePrefix;
     $imgPath = "images";
@@ -80,7 +149,7 @@ function getExistingImagePath($productId, $newImgName, $sku)
 function resize($imgFileName, $imgExistingPath)
 {
     $imgDirArray = array(31, 50, 56, 60, 75, 88, 100, 113, 125, 133, 135, 145, 150, 180, 200, 210, 300, 400, 500, 1000);
-    foreach ($imgDirArray AS $key => $size) {
+    foreach ($imgDirArray AS $size) {
         if ($size == 88) {
             $width = 88;
             $height = 77;
@@ -95,7 +164,7 @@ function resize($imgFileName, $imgExistingPath)
 
 function resizeImageToS3($imgFileName, $dir, $width, $height, $imgExistingPath)
 {
-    global $rootDir, $lB, $tablePrefix;
+    global $rootDir;
 
     $source_file = $rootDir . "media/catalog/product/" . $imgExistingPath . "/" . $imgFileName;
     $fileName = $rootDir . "media/catalog/product/" . $dir . "/" . $imgExistingPath . "/" . $imgFileName;
@@ -117,7 +186,6 @@ function resizeImageToS3($imgFileName, $dir, $width, $height, $imgExistingPath)
         }
     }
     copy($source_file, $fileName);
-
     if (file_exists($source_file)) {
         $image_info = getimagesize($source_file);
 
@@ -153,24 +221,14 @@ function resizeImageToS3($imgFileName, $dir, $width, $height, $imgExistingPath)
             $im->setCompressionQuality(100);
             $im->sharpenImage(0, 1, Imagick::CHANNEL_ALL);
         } else {
-            echo "Problem in if conditions";
-            exit;
+            
         }
 
         $Res = $im->writeImage($fileName);
         if ($Res) {
             $exe_image = '/usr/bin/s3cmd put --acl-public --add-header=\'Cache-Control:no-cache\' -c /var/www/ItsHot/bucket/.s3cfg ' . $fileName . ' s3://itshot/catalog/product/' . $dir . '/' . $imgExistingPath . '/' . $imgFileName;
-            $output = shell_exec($exe_image);
-            if ($output) {
-                //echo "{$lB}Moved to S3 file=>".$exe_image;
-            } else {
-                echo "{$lB}Resized image not moved to S3 file=>" . $exe_image;
-            }
-        } else {
-            echo "{$lB}Can not resize image.";
+            shell_exec($exe_image);
         }
-    } else {
-        echo "{$lB}File does not exists=>{$fileName}";
     }
 }
 
@@ -181,14 +239,12 @@ function disbleImages($productId, $sku)
     $mediaSql = $conn->fetchAll($sql2);
 
     $finalImagePath = '';
-    $disableimage = '';
     $ismain = 0;
     foreach ($mediaSql as $rowIm) {
         $imageName = $rowIm['value'];
         $valueId = $rowIm['value_id'];
         $imageRoot = 'https://media.itshot.com/catalog/product';
         $finalImagePath = $imageRoot . $imageName;
-
         list($Imgwidth, $Imgheight) = getimagesize($finalImagePath);
         if (($Imgwidth <= 999 || $Imgheight <= 999) && ($Imgwidth >= 800 || $Imgheight >= 800)) {
             $chk_image_query = "SELECT entity_id,mg.value_id,mgv.label FROM " . $tablePrefix . "catalog_product_entity_media_gallery mg, " . $tablePrefix . "catalog_product_entity_media_gallery_value mgv where mg.entity_id=$productId and mg.value_id=mgv.value_id and mg.value_id='" . $valueId . "' and disabled=0";
@@ -200,13 +256,12 @@ function disbleImages($productId, $sku)
             if ($mainImageValueId != '') {
                 $ismain = 1;
             }
+
             if ($chk_image_query_res['value_id'] > 0 && $ismain != 1) {
                 $label = $chk_image_query_res['label'];
                 $disable_image_query = "UPDATE " . $tablePrefix . "catalog_product_entity_media_gallery_value mgv set mgv.disabled=1 where mgv.value_id=" . $chk_image_query_res['value_id'];
                 $write->query($disable_image_query);
-
                 $disableSku = $sku . "=>" . $label;
-                //Disable sku is store in the variable for sending it in the email notification
             }
         }
     }
@@ -216,14 +271,9 @@ function disbleImages($productId, $sku)
 function scaleImage($image_width, $image_height, $max_width, $max_height)
 {
     $scaleImg = array();
-    // Get current dimensions
     $old_width = $image_width;
     $old_height = $image_height;
-
-    // Calculate the scaling we need to do to fit the image inside our frame
     $scale = min($max_width / $old_width, $max_height / $old_height);
-
-    // Get the new dimensions
     $new_width = ceil($scale * $old_width);
     $new_height = ceil($scale * $old_height);
     $scaleImg = array("w" => $new_width, "h" => $new_height);
@@ -232,8 +282,7 @@ function scaleImage($image_width, $image_height, $max_width, $max_height)
 
 function copyInAnotherFolder($imageName)
 {
-    global $rootDir, $directory, $backupDirectory;
-
+    global $rootDir, $backupDirectory;
     if (file_exists($rootDir . "adempierstock/imagescript/" . $backupDirectory . $imageName)) {
         $exImage = explode(".", $imageName);
         $sku = $exImage[0];
@@ -241,20 +290,19 @@ function copyInAnotherFolder($imageName)
         rename($rootDir . "adempierstock/imagescript/" . $backupDirectory . $imageName, $rootDir . "adempierstock/imagescript/" . $backupDirectory . $sku . "-" . date('d-m-Y') . "." . $exImage);
         $result++;
 
-        if (copy($rootDir . "adempierstock/imagescript/" . $directory . $imageName, $rootDir . "adempierstock/imagescript/" . $backupDirectory . $imageName)) {
-            unlink($rootDir . "adempierstock/imagescript/" . $directory . $imageName);
+        if (copy($rootDir . "adempierstock/imagescript/"  . $imageName, $rootDir . "adempierstock/imagescript/" . $backupDirectory . $imageName)) {
+            unlink($rootDir . "adempierstock/imagescript/" . $imageName);
         }
     } else {
-        //Added the condition for not existing images in the old folder at 19-12-2017 by Ankush
-        if (copy($rootDir . "adempierstock/imagescript/" . $directory . $imageName, $rootDir . "adempierstock/imagescript/" . $backupDirectory . $imageName)) {
-            unlink($rootDir . "adempierstock/imagescript/" . $directory . $imageName);
+        if (copy($rootDir . "adempierstock/imagescript/" . $imageName, $rootDir . "adempierstock/imagescript/" . $backupDirectory . $imageName)) {
+            unlink($rootDir . "adempierstock/imagescript/" . $imageName);
         }
     }
 }
 
 function getoldimage($label, $pid)
 {
-    global $conn, $write, $tablePrefix;
+    global $conn, $tablePrefix;
     if ($label == "main") {
         $query = "SELECT value FROM " . $tablePrefix . "catalog_product_entity_varchar pev WHERE entity_id='" . $pid . "' AND attribute_id=85";
     } else {
@@ -270,7 +318,7 @@ function getoldimage($label, $pid)
 
 function updateimagelabel_position($pid, $label, $position, $image, $sku, $ismain = 0, $filename)
 {
-    global $conn, $write, $lB, $tablePrefix;
+    global $conn, $write, $tablePrefix;
     $gallerySQL = "SELECT value_id, value FROM " . $tablePrefix . "catalog_product_entity_media_gallery WHERE value ='" . $image . "' and  entity_id=" . $pid;
     $gallerySQLRes = $conn->fetchRow($gallerySQL);
 
@@ -293,6 +341,7 @@ function updateimagelabel_position($pid, $label, $position, $image, $sku, $ismai
         $insertSQLLabel = "INSERT INTO " . $tablePrefix . "catalog_product_entity_media_gallery_value(value_id,label,position) values('" . $lastInsertId . "','" . $label . "','" . $position . "' )";
         $write->query($insertSQLLabel);
     }
+
 
     $disableimage = 0;
     if (($label == "wh" || $label == "ye" || $label == "ro" || $label == "bl" || $label == "tt" ) && $ismain == 1) {

@@ -42,7 +42,12 @@
 
                     function progress() {
                         var val = progressbar.progressbar("value") || 0;
-                        progressbar.progressbar("value", val + 2);
+                        $.ajax({
+                            url: 'https://www.itshot.com/adempierstock/imagescript/ajax-upload-image.php',
+                            success: function (data) {
+                                progressbar.progressbar("value", data.percent);
+                            }
+                        });
                         if (val < 99) {
                             setTimeout(progress, 80);
                         }
