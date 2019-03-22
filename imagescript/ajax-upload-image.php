@@ -68,12 +68,10 @@ if (($status['state'] == 'init' || $status['state'] == 'processing') && $status[
                     
                     if (file_exists($rootDir . "media/catalog/product" . $oldimage)) {
                         unlink($rootDir . "media/catalog/product" . $oldimage);
-                        deleteFileFromAmazonS3($imgname, $imgExistingPath);
                         if (copy($rootDir . "adempierstock/imagescript/"  . $filename, $rootDir . "media/catalog/product" . $oldimage)) {
                             updateimagelabel_position($productId, $label, $position, $oldimage, $sku, $ismain, $filename);
                             resize($imgname, $imgExistingPath);
-                            uploadFileToAmazonS3($imgname, $imgExistingPath);
-                            copyInAnotherFolder($filename);
+                            copyInAnotherFolder(basename($filename));
                             disbleImages($productId, $sku);
                             $myFile = $logFileAdempier;
 
@@ -95,8 +93,7 @@ if (($status['state'] == 'init' || $status['state'] == 'processing') && $status[
                         if (copy($rootDir . "adempierstock/imagescript/"  . $filename, $rootDir . "media/catalog/product/{$imgExistingPath}/" . $newImgName)) {
                             updateimagelabel_position($productId, $label, $position, "/{$imgExistingPath}/" . $newImgName, $sku, $ismain, $filename);
                             resize($newImgName, $imgExistingPath);
-                            uploadFileToAmazonS3($newImgName, $imgExistingPath);
-                            copyInAnotherFolder($filename);
+                            copyInAnotherFolder(basename($filename));
                             disbleImages($productId, $sku);
                             $myFile = $logFileAdempier;
 

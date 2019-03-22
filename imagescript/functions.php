@@ -95,23 +95,6 @@ function parseImage($filename)
     return array($sku, $label, $ext);
 }
 
-function uploadFileToAmazonS3($imgFileName, $imgExistingPath)
-{
-    global $rootDir;
-    $exe_image = '/usr/bin/s3cmd put --acl-public --add-header=\'Cache-Control:no-cache\' -c /var/www/ItsHot/bucket/.s3cfg ' . $rootDir . 'media/catalog/product/' . $imgExistingPath . '/' . $imgFileName . ' s3://itshot/media/catalog/product/' . $imgExistingPath . '/' . $imgFileName;
-    shell_exec($exe_image);
-    $exe_image2 = '/usr/bin/s3cmd put --acl-public --add-header=\'Cache-Control:no-cache\' -c /var/www/ItsHot/bucket/.s3cfg ' . $rootDir . 'media/catalog/product/' . $imgExistingPath . '/' . $imgFileName . ' s3://itshot/catalog/product/' . $imgExistingPath . '/' . $imgFileName;
-    shell_exec($exe_image2);
-}
-
-function deleteFileFromAmazonS3($imgFileName, $imgExistingPath)
-{
-    $exe_image = '/usr/bin/s3cmd del -c /var/www/ItsHot/bucket/.s3cfg s3://itshot/media/catalog/product/' . $imgExistingPath . '/' . $imgFileName;
-    shell_exec($exe_image);
-    $exe_image2 = '/usr/bin/s3cmd del -c /var/www/ItsHot/bucket/.s3cfg s3://itshot/catalog/product/' . $imgExistingPath . '/' . $imgFileName;
-    shell_exec($exe_image2);    
-}
-
 function selectProductUrlKey($productId)
 {
     global $conn, $tablePrefix;
@@ -195,10 +178,8 @@ function resizeImageToS3($imgFileName, $dir, $width, $height, $imgExistingPath)
         $imageSrcWidth = $width;
         $imageSrcHeight = $height;
 
-
         if ($imageSrcWidth > 0 & $imageSrcHeight > 0) {
             if (($image_info[0] > $imageSrcWidth && $image_info[1] > $imageSrcHeight) || ($image_info[0] < $imageSrcWidth && $image_info[1] > $imageSrcHeight) || ($image_info[0] > $imageSrcWidth && $image_info[1] < $imageSrcHeight)) {
-                //Scale image in propotions
                 $scaleImage = scaleImage($image_info[0], $image_info[1], $imageSrcWidth, $imageSrcHeight);
                 $im->thumbnailImage($scaleImage["w"], $scaleImage["h"]);
                 $im->setCompression(Imagick::COMPRESSION_JPEG);
@@ -223,12 +204,7 @@ function resizeImageToS3($imgFileName, $dir, $width, $height, $imgExistingPath)
         } else {
             
         }
-
-        $Res = $im->writeImage($fileName);
-        if ($Res) {
-            $exe_image = '/usr/bin/s3cmd put --acl-public --add-header=\'Cache-Control:no-cache\' -c /var/www/ItsHot/bucket/.s3cfg ' . $fileName . ' s3://itshot/catalog/product/' . $dir . '/' . $imgExistingPath . '/' . $imgFileName;
-            shell_exec($exe_image);
-        }
+        $im->writeImage($fileName);
     }
 }
 
