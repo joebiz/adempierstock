@@ -81,12 +81,16 @@ function parseImage($filename)
 {
     global $labels;
     $sku = '';
+    $label = '';
     $ext = pathinfo($filename, PATHINFO_EXTENSION);
     $name = basename($filename, '.' . $ext);
-    foreach ($labels as $label) {
-        if (preg_match("/{$label}$/", $name) == 1) {
-            $sku = str_replace($label, '', $name);
-            break;
+    
+    foreach ($labels as $l) {
+        if (preg_match("/{$l}$/", $name) == 1) {
+            if(strlen($label) < strlen($l)){
+                $label = $l;
+                $sku = str_replace($l, '', $name);
+            }
         }
     }
     if (!$sku || !$label) {
@@ -259,19 +263,19 @@ function scaleImage($image_width, $image_height, $max_width, $max_height)
 function copyInAnotherFolder($imageName)
 {
     global $rootDir, $backupDirectory;
-    if (file_exists($rootDir . "adempierstock/imagescript/" . $backupDirectory . basename($imageName))) {
+    if (file_exists($rootDir . "adempierstock/imagescript/" . $backupDirectory . $imageName)) {
         $exImage = explode(".", $imageName);
         $sku = $exImage[0];
         $exImage = $exImage[1];
-        rename($rootDir . "adempierstock/imagescript/" . $backupDirectory . basename($imageName), $rootDir . "adempierstock/imagescript/" . $backupDirectory . $sku . "-" . date('d-m-Y') . "." . $exImage);
+        rename($rootDir . "adempierstock/imagescript/" . $backupDirectory . $imageName, $rootDir . "adempierstock/imagescript/" . $backupDirectory . $sku . "-" . date('d-m-Y') . "." . $exImage);
         $result++;
 
-        if (copy($rootDir . "adempierstock/imagescript/"  . $imageName, $rootDir . "adempierstock/imagescript/" . $backupDirectory . basename($imageName))) {
-            unlink($rootDir . "adempierstock/imagescript/" . $imageName);
+        if (copy($rootDir . "adempierstock/imagescript/images_to_update/"  . $imageName, $rootDir . "adempierstock/imagescript/" . $backupDirectory .$imageName)) {
+            unlink($rootDir . "adempierstock/imagescript/images_to_update/" . $imageName);
         }
     } else {
-        if (copy($rootDir . "adempierstock/imagescript/" . $imageName, $rootDir . "adempierstock/imagescript/" . $backupDirectory . basename($imageName))) {
-            unlink($rootDir . "adempierstock/imagescript/" . $imageName);
+        if (copy($rootDir . "adempierstock/imagescript/images_to_update/" . $imageName, $rootDir . "adempierstock/imagescript/" . $backupDirectory . $imageName)) {
+            unlink($rootDir . "adempierstock/imagescript/images_to_update/" . $imageName);
         }
     }
 }

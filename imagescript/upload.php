@@ -40,19 +40,31 @@
                         }
                     });
 
-                    function progress() {
-                        var val = progressbar.progressbar("value") || 0;
-                        $.ajax({
-                            url: 'https://www.itshot.com/adempierstock/imagescript/ajax-upload-image.php',
-                            success: function (data) {
-                                progressbar.progressbar("value", data.percent);
+                    $.ajax({
+                        url: '/adempierstock/imagescript/getListImages.php',
+                        success: function (data) {
+                            var percent = 1 / data.length * 100;
+                            if (data.length > 0) {
+                                data.forEach(function (a) {
+                                    $.ajax({
+                                        url: '/adempierstock/imagescript/processImage.php',
+                                        data: {filename: a},
+                                        success: function (data) {
+                                            if (!data.errno) {
+                                                var val = progressbar.progressbar("value") || 0;
+                                                progressbar.progressbar("value", Math.ceil(val + percent));
+                                            } else {
+                                                console.log(a);    
+                                            }
+                                        }
+                                    });
+                                });
+                            } else {
+                                alert('Not found images');
                             }
-                        });
-                        if (val < 99) {
-                            setTimeout(progress, 80);
                         }
-                    }
-                    setTimeout(progress, 2000);
+                    });
+
                 });
             </script>
         </div>
