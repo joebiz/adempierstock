@@ -25,7 +25,7 @@ if ($filename) {
                 $urlSQLRes = $conn->fetchRow($urlSQL);
                 $urlKey = $urlSQLRes["value"];
             }
-
+            $lab = $appendStr;
             $ismain = 0;
             if (strstr($appendStr, "main")) {
                 $appendStr = str_replace("main", "", $appendStr);
@@ -39,7 +39,7 @@ if ($filename) {
             $oldImgName = $urlKey . "_" . $appendStr . "." . $fileExtension;
             $newImgName = $urlKey . "_" . $appendStr . "." . $fileExtension;
             $label = $appendStr;
-            $position = array_search($appendStr, $labels) + 1;
+            $position = array_search($lab, $labels) + 1;
             $urlKeyWithType = $urlKey . $appendStr;
             $ademiperUrlKey = $urlKey . "_" . $position;
 

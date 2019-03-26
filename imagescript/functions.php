@@ -14,7 +14,7 @@ $logFile = $rootDir . "adempierstock/imagescript/log/log_override-images" . $fil
 $logFileWebpath = "https://www.itshot.com/adempierstock/imagescript/log/log_override-images" . $filePostFix;
 $labels = array(
     'main', 'mainwh', 'mainye', 'mainro', 'mainbl', 'maintt', 'mainwyr', 'mainwr', 'mainwy',
-    'ye', 'wh', 'ro', 'bl', 'tt', 'bk', 'wyr','wr', 'wy',
+    'ye', 'wh', 'ro', 'bl', 'tt', 'wyr','wr', 'wy',
     'back', 'backwh','backye', 'backro', 'backbl', 'backtt', 'backwyr', 'backwr', 'backwy',
     'bod', 'bodwh', 'bodye', 'bodro', 'bodbl', 'bodtt', 'bodwyr', 'bodwr', 'bodwy',
     'box', 'boxwh','boxye', 'boxro', 'boxbl', 'boxtt','boxwyr', 'boxwr', 'boxwy',
