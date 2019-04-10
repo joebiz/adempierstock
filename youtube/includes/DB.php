@@ -6,16 +6,17 @@ class DB {
 	//public $dbUsername =$dbUsername; 
 	//public $dbPassword =$dbPassword;
 	//public $dbName =$dbName;
-	function __construct($dbHost,$dbUsername, $dbPassword, $dbName){
+	protected $db;
+                function __construct($dbHost,$dbUsername, $dbPassword, $dbName){
 		//Database configuration
 		//$dbHost = 'localhost'; 
 		//$dbUsername = 'mldemo2_clients';
 		//$dbPassword = '123456a2';
 		//$dbName = 'mldemo2_itshot-erp2'; 
-		$this->db->$dbHost     = $dbHost;
-		$this->db->$dbUsername = $dbUsername;
-		$this->db->$dbHost     = $dbPassword;
-		$this->db->$dbHost     = $dbName;
+//		$this->db->$dbHost     = $dbHost;
+//		$this->db->$dbUsername = $dbUsername;
+//		$this->db->$dbHost     = $dbPassword;
+//		$this->db->$dbHost     = $dbName;
 		//Connect database
 		$conn = new mysqli($dbHost, $dbUsername, $dbPassword, $dbName);
 		if($conn->connect_error){
