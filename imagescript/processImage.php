@@ -57,10 +57,9 @@ if ($filename) {
                     resize($imgname, $imgExistingPath);
                     copyInAnotherFolder($filename);
                     disbleImages($productId, $sku);
-                    $myFile = $logFileAdempier;
 
-                    if (!file_exists($rootDir . $adempierDirectory . $myFile)) {
-                        $currentFile = fopen($rootDir . $adempierDirectory . $myFile, "w");
+                    if (!file_exists($logFileAdempier)) {
+                        $currentFile = fopen($logFileAdempier, "w");
                         fclose($currentFile);
                     }
 
@@ -77,10 +76,9 @@ if ($filename) {
                     resize($newImgName, $imgExistingPath);
                     copyInAnotherFolder($filename);
                     disbleImages($productId, $sku);
-                    $myFile = $logFileAdempier;
 
-                    if (!file_exists($rootDir . $adempierDirectory . $myFile)) {
-                        $currentFile = fopen($rootDir . $adempierDirectory . $myFile, "w");
+                    if (!file_exists($logFileAdempier)) {
+                        $currentFile = fopen($logFileAdempier, "w");
                         fclose($currentFile);
                     }
                     $mediaSql = "select value from " . $tablePrefix . "catalog_product_entity_varchar where entity_id='" . $productId . "' and attribute_id='85'";
