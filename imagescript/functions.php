@@ -226,7 +226,7 @@ function disbleImages($productId, $sku)
         $imageRoot = 'https://media.itshot.com/catalog/product';
         $finalImagePath = $imageRoot . $imageName;
         list($Imgwidth, $Imgheight) = getimagesize($finalImagePath);
-        if (($Imgwidth <= 999 || $Imgheight <= 999) && ($Imgwidth >= 800 || $Imgheight >= 800)) {
+        if ($Imgwidth <= 999 || $Imgheight <= 999) {
             $chk_image_query = "SELECT entity_id,mg.value_id,mgv.label FROM " . $tablePrefix . "catalog_product_entity_media_gallery mg, " . $tablePrefix . "catalog_product_entity_media_gallery_value mgv where mg.entity_id=$productId and mg.value_id=mgv.value_id and mg.value_id='" . $valueId . "' and disabled=0";
             $chk_image_query_res = $conn->fetchRow($chk_image_query);
 
