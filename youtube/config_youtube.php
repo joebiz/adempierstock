@@ -1,8 +1,8 @@
 <?php
     // OAUTH Configuration
     session_save_path("/tmp");
-    $oauthClientID = '893043449708-hdqjcindjs6gabplp90to8i3c1p080et.apps.googleusercontent.com';
-    $oauthClientSecret = 'mEGvfBI7CcoAbCIYyVz5L6ti';
+    $oauthClientID = '54573274853-3klnlp4kheg9cvdhfm44fglfn7kk0imu.apps.googleusercontent.com';
+    $oauthClientSecret = 'Jjc5XeCKkhuV__N38XyKHwpm';
     $baseUri = 'https://www.itshot.com/adempierstock/youtube/import-videos-youtube.php';
     $redirectUri = 'https://www.itshot.com/adempierstock/youtube/import-videos-youtube.php';  
     
