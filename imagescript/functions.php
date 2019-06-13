@@ -155,6 +155,10 @@ function resizeImageToS3($imgFileName, $dir, $width, $height, $imgExistingPath)
 
     $source_file = $rootDir . "media/catalog/product/" . $imgExistingPath . "/" . $imgFileName;
     $fileName = $rootDir . "media/catalog/product/" . $dir . "/" . $imgExistingPath . "/" . $imgFileName;
+    
+    if(!is_dir(dirname($fileName))){
+        mkdir(dirname($fileName));
+    }
 
     if (!file_exists($rootDir . "media/catalog/product/" . $dir)) {
         mkdir($rootDir . "media/catalog/product/" . $dir, 0777);

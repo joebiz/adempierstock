@@ -71,7 +71,13 @@ if ($filename) {
                     file_put_contents($myFile, $stringData, FILE_APPEND);
                 }
             } else {
-                if (copy($rootDir . "adempierstock/imagescript/images_to_update/" . $filename, $rootDir . "media/catalog/product/{$imgExistingPath}/" . $newImgName)) {
+                $sourceImage = $rootDir . "adempierstock/imagescript/images_to_update/".$filename;
+                $targetImage = $rootDir . "media/catalog/product/{$imgExistingPath}/".$newImgName;
+                $targetDir = dirname($targetImage);
+                if (!is_dir($targetDir)) {
+                    mkdir($targetDir);
+                }
+                if (copy($sourceImage,  $targetImage)) {
                     updateimagelabel_position($productId, $label, $position, "/{$imgExistingPath}/" . $newImgName, $sku, $ismain, $filename);
                     resize($newImgName, $imgExistingPath);
                     copyInAnotherFolder($filename);
