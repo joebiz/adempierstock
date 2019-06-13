@@ -52,7 +52,7 @@ class Product
         return $this->getConnection()->fetchAll($select);
     }
 
-    public function selectProductUrlKey($productId)
+    public function getProductUrlKey($productId)
     {
         $select = $this->getConnection()->select();
         $select->from($this->getUrlRewriteTable(), array('request_path'));
@@ -64,7 +64,38 @@ class Product
         }
         $select = $this->getConnection()->select();
         $select->from($this->getTableName('catalog_product_entity_varchar'), array('value'));
-        $select->where('attribute_id=' . self::ATTR_ID_URL_KEY . ' AND entity_id= ?', $productId);
+        $select->where('attribute_id= ?', self::ATTR_ID_URL_KEY);
+        $select->where('entity_id= ?', $productId);
+        return $this->getConnection()->fetchOne($select);
+    }
+
+    public function getProductImage($productId, $label = 'main')
+    {
+        $image = $this->getProductImageByLabel($productId, $label);
+        return $image ? $image : 'no_image';
+    }
+
+    public function getProductImageByLabel($productId, $label = 'main')
+    {
+        return $label == 'main' ? $this->getProductImageMain($productId) : $this->getProductImageFromGalleryByLabel($productId, $label);
+    }
+
+    public function getProductImageFromGalleryByLabel($productId, $label = 'main')
+    {
+        $select = $this->getConnection()->select();
+        $select->from(array('mgallery' => $this->getProductMediaGalleryTable()), array('value'));
+        $select->join(array('mgalleryvalue' => $this->getProductMediaGalleryValueTable()), 'mgallery.value_id = mgalleryvalue.value_id  and mgalleryvalue.disabled = 0 AND mgalleryvalue.store_id = 0', array());
+        $select->where('mgalleryvalue.label = ?', $label);
+        $select->where('mgallery.entity_id = ?', $productId);
+        return $this->getConnection()->fetchOne($select);
+    }
+
+    public function getProductImageMain($productId)
+    {
+        $select = $this->getConnection()->select();
+        $select->from($this->getTableName('catalog_product_entity_varchar'));
+        $select->where('entity_id = ?', $productId);
+        $select->where('attribute_id = ?', self::ATTR_ID_IMAGE);
         return $this->getConnection()->fetchOne($select);
     }
 
