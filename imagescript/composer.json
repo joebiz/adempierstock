@@ -1,0 +1,14 @@
+{
+    "name": "adempier/imagescript",
+    "description": "Automatic Upload Image",
+    "authors": [{
+        "name": "Joe",
+        "email": "joe@onlinebizsoft.com"
+    }],
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "Adempier\\ImageScript\\": "src/"
+        }
+    }
+}
