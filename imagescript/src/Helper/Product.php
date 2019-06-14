@@ -99,6 +99,60 @@ class Product
         return $this->getConnection()->fetchOne($select);
     }
 
+    public function getMediaImageUrl($imageName)
+    {
+        return 'https://media.itshot.com/catalog/product' . $imageName;
+    }
+
+    public function fetchRow($select)
+    {
+        return $this->getConnection()->fetchRow($select);
+    }
+
+    public function disbleImages($productId, $sku)
+    {
+        global $conn, $write, $tablePrefix;
+        $result = $this->getConnection()->fetchAll(
+                $this->getConnection()->select()
+                        ->from($this->getProductMediaGalleryTable(), array('value_id', 'value'))
+                        ->where('entity_id = ?', $productId)
+        );
+
+        $finalImagePath = '';
+        $ismain = 0;
+        foreach ($result as $rowIm) {
+            $imageName = $rowIm['value'];
+            $valueId = $rowIm['value_id'];
+            list($Imgwidth, $Imgheight) = getimagesize($this->getMediaImageUrl($imageName));
+            if ($Imgwidth <= 999 || $Imgheight <= 999) {
+                $chk_image_query_res = $this->fetchRow(
+                        $this->getConnection()->select()
+                                ->from(array('mg' => $this->getProductMediaGalleryTable()), array('entity_id', 'value_id'))
+                                ->join(array('mgv' => $this->getProductMediaGalleryValueTable()), 'mg.value_id=mgv.value_id AND mgv.disabled = 0', array('label'))
+                                ->where('value_id = ?', $valueId)
+                                ->where('entity_id = ?', $productId)
+                );
+
+                $mainImageValueId = $this->getConnection->fetchOne(
+                        $this->getConnection()->select()
+                                ->from($this->getTableName('catalog_product_entity_varchar'), array('value_id'))
+                                ->where('attribute_id = ?', self::ATTR_ID_IMAGE)
+                                ->where('entity_id = ?', $productId)
+                                ->where('value = ? ', $imageName)
+                );
+                if ($mainImageValueId != '') {
+                    $ismain = 1;
+                }
+
+                if ($chk_image_query_res['value_id'] > 0 && $ismain != 1) {
+                    $label = $chk_image_query_res['label'];
+                    $disable_image_query = "UPDATE " . $tablePrefix . "catalog_product_entity_media_gallery_value mgv set mgv.disabled=1 where mgv.value_id=" . $chk_image_query_res['value_id'];
+                    $this->getWriteConnection()->query($disable_image_query);
+                }
+            }
+        }
+    }
+
     public function getResource()
     {
         return Mage::getSingleton('core/resource');
@@ -107,6 +161,11 @@ class Product
     public function getConnection()
     {
         return $this->getResource()->getConnection('core_read');
+    }
+
+    public function getWriteConnection()
+    {
+        return $this->getResource()->getConnection('core_write');
     }
 
 }
